@@ -40,3 +40,54 @@ export const getTransactions = async (req: Request, res: Response) => {
       .json({ error: "Internal Server Error: Failed to fetch transactions" });
   }
 };
+
+export const getTransactionsByUserId = async (req: Request, res: Response) => {
+    try {
+      const { userId } = req.params;
+      if (!userId) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      const transaction = await sql`SELECT * FROM transactions WHERE user_id = ${userId} ORDER BY created_at DESC`;
+      if (transaction.length === 0) {
+        return res.status(404).json({ message: "Transaction not found" });
+      }
+      res.json({
+        payload: {
+          data: transaction,
+        },
+      });
+    }
+    catch (error) {
+      console.error("Error fetching User transactions:", error);
+      res
+        .status(500)
+        .json({ error: "Internal Server Error: Failed to fetch User transactions" });
+    }
+  };
+
+
+  export const deleteTransactionById = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      if(isNaN(parseInt(id))) {
+          return res.status(400).json({ message: "Invalid transaction ID" });
+      }
+      
+      const transaction = await sql`DELETE FROM transactions WHERE id = ${id} RETURNING *`;
+      if (transaction.length === 0) {
+        return res.status(404).json({ message: "Transaction not found" });
+      }
+      res.json({
+        payload: {
+          data: transaction[0],
+          message: "Transaction deleted successfully",
+        },
+      });
+    }
+    catch (error) {
+      console.error("Error deleting transactions:", error);
+      res
+        .status(500)
+        .json({ error: "Internal Server Error: Failed to delete transactions" });
+    }
+  }
