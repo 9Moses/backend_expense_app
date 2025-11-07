@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { sql } from "./config/db";
 import  transactionRoute from "./routes/transaction.route";
+import rateLimiter from "./middleware/rateLimiter";
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(rateLimiter);
 
 async function initDB() {
   try {
@@ -35,7 +37,7 @@ app.get("/", (req, res) => {
   res.send("Expense Tracker! This is the backend server.");
 });
 
-app.use("/api", transactionRoute );
+app.use("/api",  transactionRoute );
 
 initDB().then(() => {
   app.listen(port, () => {
