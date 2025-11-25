@@ -1,12 +1,12 @@
- import cron from "cron";
+import { CronJob } from "cron";
 import https from "https";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const job = new cron.CronJob("*/14 * * * *", function () {
+const job = new CronJob("*/14 * * * *", function () {
   https
-    .get(process.env.API_URL  ?? '', (res) => {
+    .get(process.env.API_URL ?? "", (res) => {
       if (res.statusCode === 200) console.log("GET request sent successfully");
       else console.log("GET request failed", res.statusCode);
     })
@@ -14,6 +14,7 @@ const job = new cron.CronJob("*/14 * * * *", function () {
 });
 
 export default job;
+
 
 // CRON JOB EXPLANATION:
 // Cron jobs are scheduled tasks that run periodically at fixed intervals
